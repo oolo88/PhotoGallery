@@ -1,9 +1,12 @@
 package com.android.bignerdranch.photogallery;
 
+import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -77,7 +80,13 @@ public class PhotoGalleryFragment extends Fragment {
     private class FetchItemsTask extends AsyncTask<Void, Void, ArrayList<GalleryItem>> {
         @Override
         protected ArrayList<GalleryItem> doInBackground(Void... params) {
-            String query = "android";
+            Activity activity = getActivity();
+            if (activity == null)
+                return new ArrayList<GalleryItem>();
+
+            String query =
+                    PreferenceManager.getDefaultSharedPreferences(activity)
+                    .getString(FlickrFetchr.PREF_SEARCH_QUERY, null);
 
             if (query != null) {
                 return new FlickrFetchr().search(query);
@@ -146,6 +155,11 @@ public class PhotoGalleryFragment extends Fragment {
                 getActivity().onSearchRequested();
                 return true;
             case R.id.menu_item_clear:
+                PreferenceManager.getDefaultSharedPreferences(getActivity())
+                        .edit()
+                        .putString(FlickrFetchr.PREF_SEARCH_QUERY, null)
+                        .commit();
+                updateItems();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

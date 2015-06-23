@@ -4,6 +4,7 @@ package com.android.bignerdranch.photogallery;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Menu;
@@ -28,6 +29,11 @@ public class PhotoGalleryActivity extends SingleFragmentActivity {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             Log.i(TAG, "Recevied a new search query: " + query);
+
+            PreferenceManager.getDefaultSharedPreferences(this)
+                    .edit()
+                    .putString(FlickrFetchr.PREF_SEARCH_QUERY, query)
+                    .commit();
         }
 
         fragment.updateItems();
